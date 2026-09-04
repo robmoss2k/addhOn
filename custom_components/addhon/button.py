@@ -31,6 +31,7 @@ from .logging_utils import reset_integration_log_level, silence_mqtt_noise
 from .param_rollback import restore_params, snapshot_params
 from .program_options import apply_pending_options, async_send_program
 from .ref_programs import download_codes
+from .washer_dryer_compat import apply_eco_dry_compatibility
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -307,6 +308,14 @@ class HonProgramCommandButton(HonBaseEntity, ButtonEntity):
                                 name,
                                 self._command_name,
                             )
+                    compatibility = apply_eco_dry_compatibility(
+                        appliance, command, pending_program
+                    )
+                    if compatibility:
+                        _LOGGER.warning(
+                            "Applied model-specific Eco wash-and-dry compatibility values: %s",
+                            compatibility,
+                        )
                     if _LOGGER.isEnabledFor(logging.DEBUG):
                         _LOGGER.debug(
                             "Button debug: sending command '%s' final_params=%s",
